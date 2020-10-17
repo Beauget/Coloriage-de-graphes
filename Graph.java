@@ -1,20 +1,20 @@
 import java.util.*;
 
 
-public class Sommet {
+class Sommet {
     String nom;
     int couleur;
     boolean estSommetActif;
-    Arraylist<Sommet> sommetPref;
-    Arraylist<Sommet> sommetInt;
+    ArrayList<Sommet> sommetPref;
+    ArrayList<Sommet> sommetInt;
 
 
     public Sommet(String nom,int couleur, boolean estSommetActif) {
         this.nom = nom;
         this.couleur = couleur;
         this.estSommetActif = true;
-        this.sommetInt = new Arraylist<Sommet>;
-        this.sommetPref = new Arraylist<Sommet>;
+        this.sommetInt = new ArrayList<Sommet>();
+        this.sommetPref = new ArrayList<Sommet>();
 
     }
 
@@ -23,13 +23,13 @@ public class Sommet {
         System.out.println("Liste sommetInt : ");
         System.out.print("( ");
         for(Sommet s : this.sommetInt) {
-            System.out.print(this.s + " ");
+            System.out.print(s + " ");
         }
         System.out.println(") ");
         System.out.print("( ");
         System.out.println("Liste sommetPref : ");
         for(Sommet s : this.sommetPref) {
-            System.out.print(this.s + " ");
+            System.out.print(s + " ");
 
         }
         System.out.println(") ");
@@ -48,7 +48,7 @@ public class Sommet {
     }
 }
 
-public abstract class Arrete {
+abstract class Arrete {
     Sommet s1;
     Sommet s2;
     boolean estArreteActif;
@@ -59,12 +59,11 @@ public abstract class Arrete {
         this.estArreteActif = true;
     }
 
-    public Sommet getS1() {
-        return s1.afficheSommet();
+    public void  getS1() {
+        s1.afficheSommet();
     }
 
-    public Sommet getS2() {
-        return s2.afficheSommet();
+    public void  getS2() { s2.afficheSommet();
     }
 
     public boolean getEstActif() {
@@ -76,21 +75,29 @@ public abstract class Arrete {
     }
 }
 
-public class ArretePref extends Arrete {
+class ArretePref extends Arrete {
     final static int type = 1;
+
+    public ArretePref(Sommet s1, Sommet s2, boolean estArreteActif) {
+        super(s1, s2, estArreteActif);
+    }
 }
 
-public class ArreteInt extends Arrete {
+class ArreteInt extends Arrete {
     final static int type = 0;
+
+    public ArreteInt(Sommet s1, Sommet s2, boolean estArreteActif) {
+        super(s1, s2, estArreteActif);
+    }
 }
 
-public class Graphe {
-    Arraylist<Sommet> listSommets;
-    Arraylist<Arrete> listArretes;
+ class Graphe {
+    ArrayList<Sommet> listSommets;
+    ArrayList<Arrete> listArretes;
 
     public Graphe() {
-        this.listSommets = new Arraylist<Sommet>;
-        this.listArretes = new Arraylist<Arrete>;
+        this.listSommets = new ArrayList<Sommet>();
+        this.listArretes = new ArrayList<Arrete>();
 
     }
 
