@@ -11,7 +11,7 @@ class Sommet {
 
     public Sommet(String nom,boolean estSommetActif) {
         this.nom = nom;
-        this.couleur = 0;
+        this.couleur = -2;
         this.estSommetActif = true;
         this.sommetInf = new ArrayList<Sommet>();
         this.sommetPref = new ArrayList<Sommet>();
@@ -99,7 +99,7 @@ abstract class Arrete {
     }
 
     public void AfficheArrete() {
-        System.out.println("Arrete : {"+ this.s1.nom + "," + this.s2.nom + "}");
+        System.out.println("Arrete : {"+ this.s1.nom + "," + this.s2.nom + "}" + " estActif : " + this.getEstActif());
     }
 }
 
@@ -131,7 +131,7 @@ class ArreteInf extends Arrete {
 
     public void getlistSommets() {
         for(Sommet s : this.listSommets) {
-            System.out.print(s.getNom() + " ");
+            System.out.print(s.getNom() + " " + "Actif : " + s.getActif() + " ");
         }
         System.out.println();
     }
@@ -142,61 +142,105 @@ class ArreteInf extends Arrete {
         }
 
     }
-
-    public Sommet minDegree(int k) {
-        int res = k;
-        Sommet temp = new Sommet();
+//Fonction qui récupère le premier sommet avec un degrés < k ET qui est encore actif
+    public Sommet Sommettraiter(int k) {
         for(Sommet s : this.listSommets) {
-            if(s.getDegree() < res) {
-                res = s.getDegree();
-                temp = s;
+            if(s.getDegree() < k && s.getActif() == true) {
+                return s;
             }
         }
-        if(res == k ) {
-            System.out.println("Besoin de spill !");
-        }
-        return temp;
+        return null;
     }
 
-    public void chaiting(int k) {
-         Sommet aTraiter = this.minDegree(k);
-
-         for(Sommet s : this.listSommets) {
-             if(s == aTraiter) {
-
-                 //Le sommet est plus actif
-                 s.noMoreActive();
-
-                 //On enlève ce sommet des différentes listes
-                 for(Sommet x : this.listSommets) {
-                     if(x.sommetPref.contains(s)) {
-                         x.sommetPref.remove(s);
-                     }
-                     if(!s.sommetInf.isEmpty()) {
-                         x.sommetInf.remove(s);
-                     }
-                 }
-                 for(Arrete z : this.listArretes) {
-                     if(z.s1.getNom() == s.nom || z.s2.getNom() == s.getNom()) {
-                         z.estArreteActif = false;
-                     }
-                 }
-
-                 //On lui attribue une couleur
-                 for(Sommet i : s.sommetPref) {
-                     s.couleur = 1 + (int)(Math.random() * ((k - 1) + 1));
-                     if(i.couleur == s.couleur) {
-                         s.couleur = 1 + (int) (Math.random() * ((k - 1) + 1));
-                     }
-                 }
-
-             }
+    public int nbSommetActif() {
+        int cpt = 0;
+        for(Sommet s : this.listSommets) {
+            if(s.getActif()) {
+                cpt++;
+            }
         }
-
-
-
+        return cpt;
     }
 
+
+
+    public void colorier(int k) {
+        if (nbSommetActif() > 1) {
+            if (Sommettraiter(k) != null) {
+                Sommet s = Sommettraiter(k);
+                        //Le sommet est plus actif
+                        s.noMoreActive();
+                        // On désactive ses arrêtes
+                        for (Arrete z : this.listArretes) {
+                            if (z.s1.getNom() == s.nom || z.s2.getNom() == s.getNom()) {
+                                z.estArreteActif = false;
+                    }
+                }
+                this.colorier(k);
+                        //IL FAUT METTRE LA COULEUR LA
+                s.estSommetActif = true;
+                ArrayList<Integer>  listCouleur = new ArrayList<Integer>();
+                for(Sommet x : s.sommetPref) {
+                    if(x.getActif()) {
+                        listCouleur.add(x.getColor());
+                        System.out.println(listCouleur);
+                        for(int i = 0; i < k; i++) {
+                            if(!(listCouleur.contains(i))) {
+                                s.couleur = i;
+                                System.out.println(s.nom + " " + s.sommetPref);
+                                i = k;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                Sommet s = new Sommet();
+                for(Sommet x : this.listSommets) {
+                    if(x.getActif()) {
+                        s = x;
+                    }
+                }
+                //Le sommet est plus actif
+                s.noMoreActive();
+                // On désactive ses arrêtes
+                for (Arrete z : this.listArretes) {
+                    if (z.s1.getNom() == s.nom || z.s2.getNom() == s.getNom()) {
+                        z.estArreteActif = false;
+                    }
+                }
+                this.colorier(k);
+                s.estSommetActif = true;
+                ArrayList<Integer>  listCouleur = new ArrayList<Integer>();
+                for(Sommet x : s.sommetPref) {
+                    if(x.getActif()) {
+                        listCouleur.add(x.getColor());
+                        System.out.println(listCouleur);
+                        System.out.println(listCouleur);
+                        for(int i = 0; i < k; i++) {
+                            if(!(listCouleur.contains(i))) {
+                                s.couleur = i;
+                                System.out.println(s.nom + " " + s.sommetPref);
+                                i = k;
+                            }
+                        }
+                        if(s.couleur == -2) {
+                            s.couleur = -1;
+                        }
+                    }
+
+                }
+            }
+        } else {
+            for(Sommet x : this.listSommets) {
+                x.afficheSommet();
+                if(x.getActif()) {
+                    x.couleur = 0;
+                }
+            }
+            System.out.println("g finit");
+        }
+    }
 
 
     public static void main(String[] args) {
@@ -254,7 +298,7 @@ class ArreteInf extends Arrete {
 
         Graphe TEST1 = new Graphe();
 
-        int k = 3;
+        int k = 1;
 
         TEST1.listSommets.add(x);
         TEST1.listSommets.add(y);
@@ -273,10 +317,57 @@ class ArreteInf extends Arrete {
         TEST1.listArretes.add(VT);
 
 
-        TEST1.chaiting(k);
-        z.afficheSommet();
-        System.out.println(ZV.getEstActif());
+        Sommet e = new Sommet("e",true);
+        Sommet f = new Sommet("f",true);
+        Sommet g = new Sommet("g",true);
+        Sommet h = new Sommet("h",true);
 
+        ArretePref EF = new ArretePref(e, f, true);
+        ArretePref EH = new ArretePref(e, h, true);
+        ArretePref FG = new ArretePref(f, g, true);
+        ArretePref GH = new ArretePref(g, h, true);
+
+        e.addSommetPref(f);
+        e.addSommetPref(h);
+
+        f.addSommetPref(g);
+        f.addSommetPref(e);
+
+        g.addSommetPref(h);
+        g.addSommetPref(f);
+
+        h.addSommetPref(e);
+        h.addSommetPref(g);
+
+
+
+
+        Graphe TEST2 = new Graphe();
+
+        TEST2.listSommets.add(e);
+        TEST2.listSommets.add(f);
+        TEST2.listSommets.add(g);
+        TEST2.listSommets.add(h);
+
+        TEST2.listArretes.add(EF);
+        TEST2.listArretes.add(EH);
+        TEST2.listArretes.add(FG);
+        TEST2.listArretes.add(GH);
+
+
+        TEST1.colorier(k);
+        TEST1.getlistArrete();
+        TEST1.getlistSommets();
+        for(Sommet s : TEST1.listSommets) {
+            System.out.println("Couleur sommet : " + s.nom + " " + s.couleur);
+        }
+
+        TEST2.colorier(k);
+        TEST2.getlistArrete();
+        TEST2.getlistSommets();
+        for(Sommet s : TEST2.listSommets) {
+            System.out.println("Couleur sommet : " + s.nom + " " + s.couleur);
+        }
 
 
     }
